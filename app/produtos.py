@@ -1,5 +1,9 @@
 import json
 import os
+from datetime import datetime
+
+from core.logging import registrar_log
+from core.backup import registrar_backup
 
 CAMINHO_PASTA = "data"
 CAMINHO_PRODUTOS = os.path.join(CAMINHO_PASTA, "estoque.json")
@@ -41,6 +45,7 @@ def cadastrar_produto():
             return
         quantidade = int(input("Quantidade inicial: "))
         preco = float(input("Preço unitário (R$): "))
+        data_hora = datetime.now().strftime("%d/%m/%Y - %H:%M:%S")
 
         produtos = carregar_produtos()
 
@@ -49,14 +54,18 @@ def cadastrar_produto():
             "nome" : nome,
             "preco" : preco,
             "quantidade": quantidade,
-            "vendido": 0
+            "vendido": 0,
+            "data_hora": data_hora
         }
+
+        registrar_backup()
 
         produtos.append(novo_produto)
 
         salvar_produto(produtos)
 
         print(f"✅ Produto '{nome}' cadastrado com sucesso!")
+        registrar_log(f"Produto cadastrado: {nome}")
     except ValueError:
         print("❌ Valor inválido. Certifique-se de digitar números válidos para quantidade e preço.")
     except Exception as e:
