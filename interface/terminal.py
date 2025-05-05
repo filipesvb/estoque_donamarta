@@ -1,0 +1,11 @@
+def mostrar_menu():
+    print("\n" + "="*40)
+    print("📦 SISTEMA DE ESTOQUE — DONA MARTA")
+    print("="*40)
+    print("1 - Cadastrar novo produto")
+    print("2 - Registrar entrada de produto")
+    print("3 - Registrar saída de produto")
+    print("4 - Listar produtos")
+    print("5 - Relatório de estoque")
+    print("6 - Sair")
+    return input("Escolha uma opção: ")
