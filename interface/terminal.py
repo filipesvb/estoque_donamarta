@@ -7,5 +7,7 @@ def mostrar_menu():
     print("3 - Registrar saída de produto")
     print("4 - Listar produtos")
     print("5 - Relatório de estoque")
-    print("6 - Sair")
+    print("6 - Editar produto")
+    print("7 - Excluir produto")
+    print("0 - Sair")
     return input("Escolha uma opção: ")

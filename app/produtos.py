@@ -15,7 +15,6 @@ def garantir_estrutura():
         with open(CAMINHO_PRODUTOS, 'w', encoding='utf-8') as arq:
             json.dump([], arq, indent=4, ensure_ascii=False)
 
-
 def carregar_produtos(caminho : str = CAMINHO_PRODUTOS):
     garantir_estrutura()
     if not os.path.exists(CAMINHO_PRODUTOS):
@@ -71,5 +70,117 @@ def cadastrar_produto():
     except Exception as e:
         print(f"❌ Erro inesperado: {e}")
 
+def registrar_entrada_produto():
+    try:
+        estoque = carregar_produtos()
+        if not estoque:
+            print("⚠️ Estoque vazio. Não há produtos para atualizar.")
+            return
+
+        print("\nProdutos disponíveis:")
+        for prod in estoque:
+            print(f"ID: {prod['id']} | {prod['nome']} | Qtd atual: {prod['quantidade']}")
+
+        id_busca = int(input("\nDigite o ID do produto para registrar entrada: "))
+        produto = next((p for p in estoque if p['id'] == id_busca), None)
+
+        if not produto:
+            print("❌ Produto não encontrado.")
+            return
+
+        qtd_adicional = int(input("Quantidade a adicionar: "))
+        if qtd_adicional <= 0:
+            print("❌ Quantidade deve ser maior que zero.")
+            return
+
+        produto['quantidade'] += qtd_adicional
+        salvar_produto(estoque)
+
+        registrar_log(f"Entrada registrada: {qtd_adicional} unidades para '{produto['nome']}' (ID {produto['id']})")
+        print(f"✅ Entrada registrada com sucesso! Novo total: {produto['quantidade']} unidades.")
+
+    except ValueError:
+        print("❌ Valor inválido. Use apenas números.")
+    except Exception as e:
+        print(f"❌ Erro inesperado: {e}")
+        registrar_log(f"Erro ao registrar entrada de produto: {e}")
+
+def registrar_saida_produto():
+    try:
+        estoque = carregar_produtos()
+        if not estoque:
+            print("⚠️ Estoque vazio. Não há produtos para atualizar.")
+            return
+
+        print("\nProdutos disponíveis:")
+        for prod in estoque:
+            print(f"ID: {prod['id']} | {prod['nome']} | Qtd atual: {prod['quantidade']}")
+
+        id_busca = int(input("\nDigite o ID do produto para registrar saída: "))
+        produto = next((p for p in estoque if p['id'] == id_busca), None)
+
+        if not produto:
+            print("❌ Produto não encontrado.")
+            return
+
+        qtd_retirada = int(input("Quantidade a retirar: "))
+        if qtd_retirada <= 0:
+            print("❌ Quantidade deve ser maior que zero.")
+            return
+
+        if qtd_retirada > produto['quantidade']:
+            print(f"❌ Quantidade insuficiente. Estoque atual: {produto['quantidade']}")
+            return
+
+        produto['quantidade'] -= qtd_retirada
+        produto['vendido'] += qtd_retirada
+        salvar_produto(estoque)
+
+        registrar_log(f"Saída registrada: {qtd_retirada} unidades de '{produto['nome']}' (ID {produto['id']})")
+        print(f"✅ Saída registrada com sucesso! Novo total: {produto['quantidade']} unidades.")
+
+    except ValueError:
+        print("❌ Valor inválido. Use apenas números.")
+    except Exception as e:
+        print(f"❌ Erro inesperado: {e}")
+        registrar_log(f"Erro ao registrar saída de produto: {e}")
 
 
+
+def excluir_produto():
+    try:
+        estoque = carregar_produtos()
+
+        if not estoque:
+            print("⚠️ Estoque vazio. Não há produtos para atualizar.")
+            return
+
+        print("="*40)
+        print("PRODUTOS CADASTRADOS".center(40))
+        print("="*40)
+        for produto in estoque:
+            print(f"ID: {produto['id']} | {produto['nome']} | Qtd atual: {produto['quantidade']}")
+
+        id_produto = int(input("\nEscolha o ID do produto que deseja excluir: "))
+        produto = next((p for p in estoque if p['id'] == id_produto), None)
+
+        if not produto:
+            print("❌ ID não encontrado")
+            return
+        
+        confirmacao = input(f"Você confirma que deseja excluir o produto: {produto['nome']} (ID: {produto['id']})?   [s / n]")
+
+        if confirmacao != 's':
+            print("❌ Exclusão cancelada.")
+            return
+        
+        print(produto)
+        estoque.remove(produto)
+        salvar_produto(estoque)
+
+        registrar_log(f"Produto excluído: {produto['nome']} (ID {produto['id']})")
+        print("✅ Produto excluído com sucesso!")
+
+    except Exception as e:
+        print(f"❌ Erro ao excluir produto: {e}")
+        registrar_log(f"Erro ao excluir produto: {e}")
