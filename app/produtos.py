@@ -58,7 +58,7 @@ def cadastrar_produto():
             "data_hora": data_hora
         }
 
-        registrar_backup()
+        registrar_backup(produtos)
 
         produtos.append(novo_produto)
 

@@ -10,8 +10,12 @@ def garantir_estrutura():
     if not os.path.exists(CAMINHO_PASTA_BACKUPS):
         os.makedirs(CAMINHO_PASTA_BACKUPS)
         
-def registrar_backup():
+def registrar_backup(dados):
     if not os.path.exists(CAMINHO_PRODUTOS):
+        return
+
+    if not dados:
+        print("não tem dados")
         return
 
     garantir_estrutura()
