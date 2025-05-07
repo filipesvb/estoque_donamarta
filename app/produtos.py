@@ -145,9 +145,69 @@ def registrar_saida_produto():
         print(f"❌ Erro inesperado: {e}")
         registrar_log(f"Erro ao registrar saída de produto: {e}")
 
+def editar_produto():
+    estoque = carregar_produtos()
 
+    if not estoque:
+        print("⚠️ Estoque vazio. Não há produtos para editar.")
+        return
+
+    print("="*40)
+    print("Produtos disponíveis".center(40))
+    print("="*40)
+    for prod in estoque:
+        print(f"ID: {prod['id']} | {prod['nome']} | Preço: {float(prod['preco']):.2f} | Qtd Atual: {prod['quantidade']}")
+
+    try:
+        id_produto = int(input(f"Digite o ID do produto que deseja editar: "))
+    except ValueError:
+        print("❌ ID inválido. Digite um número inteiro.")
+        return
+    
+    produto_escolhido = next((p for p in estoque if p['id'] == id_produto), None)
+
+    if not produto_escolhido:
+        print("❌ Produto não encontrado.")
+        return
+
+    produto_antigo = {
+        "nome": produto_escolhido['nome'],
+        "quantidade": produto_escolhido['quantidade'],
+        "preco": produto_escolhido['preco']
+    }
+
+    print(f"\nVocê escolheu: {produto_escolhido['nome']} (ID: {produto_escolhido['id']})")
+
+    novo_nome = input(f"Nome: [{produto_escolhido['nome']}]").strip()
+    try:
+        nova_quantidade = int(input(f"Quantidade: [{produto_escolhido['quantidade']}]").strip())
+    except ValueError:
+        print("❌ Quantidade inválida. Alteração ignorada.")
+    try:
+        novo_preco = int(input(f"Preço: [{produto_escolhido['preco']}]").strip())
+    except ValueError:
+        print("❌ Preço inválido. Alteração ignorada.")
+
+    if not novo_nome and not nova_quantidade and not novo_preco:
+        print("Nada foi alterado. Retornando...")
+        return
+
+    registrar_backup(estoque)
+
+    if novo_nome:
+        produto_escolhido['nome'] = novo_nome
+    if nova_quantidade:
+        produto_escolhido['quantidade'] = nova_quantidade
+    if novo_preco:
+        produto_escolhido['preco'] = novo_preco
+
+    salvar_produto(estoque)
+
+    registrar_log(f"Produto {produto_escolhido['id']} editado. [{produto_antigo['nome']} | {produto_antigo['preco']} | {produto_antigo['quantidade']}] => [{produto_escolhido['nome']} | {produto_escolhido['preco']} | {produto_escolhido['quantidade']}]")
+    print(f"✅ Produto editado com sucesso: ID {produto_escolhido['id']} - {produto_escolhido['nome']}")
 
 def excluir_produto():
+
     try:
         estoque = carregar_produtos()
 
@@ -184,3 +244,4 @@ def excluir_produto():
     except Exception as e:
         print(f"❌ Erro ao excluir produto: {e}")
         registrar_log(f"Erro ao excluir produto: {e}")
+

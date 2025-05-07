@@ -1,5 +1,5 @@
 from interface.terminal import mostrar_menu
-from app.produtos import cadastrar_produto, registrar_entrada_produto, registrar_saida_produto, excluir_produto
+from app.produtos import cadastrar_produto, registrar_entrada_produto, registrar_saida_produto, excluir_produto, editar_produto
 
 def main():
 
@@ -20,7 +20,8 @@ def main():
         elif opcao == '5':
             print("👉 Relatório de estoque (em breve)")
         elif opcao == '6':
-            print("👉 Editar produto (em breve)")
+            # print("👉 Editar produto (em breve)")
+            editar_produto()
         elif opcao == '7':
             # print("👉 Excluir produto (em breve)")
             excluir_produto()
