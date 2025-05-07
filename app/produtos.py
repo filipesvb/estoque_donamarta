@@ -179,18 +179,29 @@ def editar_produto():
         "preco": produto_escolhido['preco']
     }
 
+    print(f"Antigo: \n{produto_antigo}")
+    print(f"Novo: \n{()}")
+
+
+    chaves_comum = ["nome", "quantidade", "preco"]
+    is_equal = all(produto_escolhido[k] == produto_antigo[k] for k in chaves_comum)
+
+    print(f"É igual: {is_equal}")
+
+
+
+    return
+
     print(f"\nVocê escolheu: {produto_escolhido['nome']} (ID: {produto_escolhido['id']})")
 
     novo_nome = input(f"Nome: [{produto_escolhido['nome']}]").strip()
-
     nova_quantidade = input(f"Quantidade: [{produto_escolhido['quantidade']}]").strip()
     novo_preco = input(f"Preço: [{produto_escolhido['preco']}]").strip()
 
     if not novo_nome and not nova_quantidade and not novo_preco:
-        print("Nada foi alterado. Retornando...")
+        print("⚠️ Nada foi alterado.")
         return
 
-    registrar_backup(estoque)
 
     if novo_nome:
         try:
@@ -208,6 +219,9 @@ def editar_produto():
         except ValueError:
             print("❌ Preço inválido. Alteração ignorada.")
 
+    if produto_escolhido == produto_antigo:
+        print("⚠️ Nada foi alterado.")
+    registrar_backup(estoque)
     salvar_produto(estoque)
 
     registrar_log(f"Produto {produto_escolhido['id']} editado. [{produto_antigo['nome']} | {produto_antigo['preco']} | {produto_antigo['quantidade']}] => [{produto_escolhido['nome']} | {produto_escolhido['preco']} | {produto_escolhido['quantidade']}]")
