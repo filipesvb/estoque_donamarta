@@ -19,8 +19,11 @@ def carregar_produtos(caminho : str = CAMINHO_PRODUTOS):
     garantir_estrutura()
     if not os.path.exists(CAMINHO_PRODUTOS):
         return []
-    with open(CAMINHO_PRODUTOS, 'r', encoding='utf-8') as arq:
-        return json.load(arq)
+    try:
+        with open(CAMINHO_PRODUTOS, 'r', encoding='utf-8') as arq:
+            return json.load(arq)
+    except json.JSONDecodeError:
+        return []
     
 def salvar_produto(lista_produtos):
 
@@ -179,14 +182,9 @@ def editar_produto():
     print(f"\nVocê escolheu: {produto_escolhido['nome']} (ID: {produto_escolhido['id']})")
 
     novo_nome = input(f"Nome: [{produto_escolhido['nome']}]").strip()
-    try:
-        nova_quantidade = int(input(f"Quantidade: [{produto_escolhido['quantidade']}]").strip())
-    except ValueError:
-        print("❌ Quantidade inválida. Alteração ignorada.")
-    try:
-        novo_preco = int(input(f"Preço: [{produto_escolhido['preco']}]").strip())
-    except ValueError:
-        print("❌ Preço inválido. Alteração ignorada.")
+
+    nova_quantidade = input(f"Quantidade: [{produto_escolhido['quantidade']}]").strip()
+    novo_preco = input(f"Preço: [{produto_escolhido['preco']}]").strip()
 
     if not novo_nome and not nova_quantidade and not novo_preco:
         print("Nada foi alterado. Retornando...")
@@ -195,11 +193,20 @@ def editar_produto():
     registrar_backup(estoque)
 
     if novo_nome:
-        produto_escolhido['nome'] = novo_nome
+        try:
+            produto_escolhido['nome'] = novo_nome
+        except ValueError:
+            print("❌ Nome inválido. Alteração ignorada.")
     if nova_quantidade:
-        produto_escolhido['quantidade'] = nova_quantidade
+        try:
+            produto_escolhido['quantidade'] = int(nova_quantidade)
+        except ValueError:
+            print("❌ Quantidade inválida. Alteração ignorada.")
     if novo_preco:
-        produto_escolhido['preco'] = novo_preco
+        try:
+            produto_escolhido['preco'] = float(novo_preco)
+        except ValueError:
+            print("❌ Preço inválido. Alteração ignorada.")
 
     salvar_produto(estoque)
 
