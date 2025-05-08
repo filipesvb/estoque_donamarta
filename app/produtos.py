@@ -173,26 +173,16 @@ def editar_produto():
         print("❌ Produto não encontrado.")
         return
 
+    print(f"\nVocê escolheu: {produto_escolhido['nome']} (ID: {produto_escolhido['id']})")
+    
     produto_antigo = {
         "nome": produto_escolhido['nome'],
         "quantidade": produto_escolhido['quantidade'],
         "preco": produto_escolhido['preco']
     }
 
-    print(f"Antigo: \n{produto_antigo}")
-    print(f"Novo: \n{()}")
-
-
     chaves_comum = ["nome", "quantidade", "preco"]
-    is_equal = all(produto_escolhido[k] == produto_antigo[k] for k in chaves_comum)
 
-    print(f"É igual: {is_equal}")
-
-
-
-    return
-
-    print(f"\nVocê escolheu: {produto_escolhido['nome']} (ID: {produto_escolhido['id']})")
 
     novo_nome = input(f"Nome: [{produto_escolhido['nome']}]").strip()
     nova_quantidade = input(f"Quantidade: [{produto_escolhido['quantidade']}]").strip()
@@ -219,8 +209,10 @@ def editar_produto():
         except ValueError:
             print("❌ Preço inválido. Alteração ignorada.")
 
-    if produto_escolhido == produto_antigo:
-        print("⚠️ Nada foi alterado.")
+    is_equal = all(produto_escolhido[k] == produto_antigo[k] for k in chaves_comum)
+    if is_equal:
+        print("⚠️ Nada foi alterado. Retornando...")
+        return
     registrar_backup(estoque)
     salvar_produto(estoque)
 
