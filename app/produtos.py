@@ -5,6 +5,10 @@ from datetime import datetime
 from core.logging import registrar_log
 from core.backup import registrar_backup
 
+from utils.validador import validar_edicao_nome, validar_edicao_preco, validar_edicao_quantidade
+
+from errors.exceptions import ErroNomeInvalido, ErroPrecoInvalido, ErroQuantidadeInvalida
+
 CAMINHO_PASTA = "data"
 CAMINHO_PRODUTOS = os.path.join(CAMINHO_PASTA, "estoque.json")
 
@@ -174,7 +178,7 @@ def editar_produto():
         return
 
     print(f"\nVocê escolheu: {produto_escolhido['nome']} (ID: {produto_escolhido['id']})")
-    
+
     produto_antigo = {
         "nome": produto_escolhido['nome'],
         "quantidade": produto_escolhido['quantidade'],
@@ -183,31 +187,39 @@ def editar_produto():
 
     chaves_comum = ["nome", "quantidade", "preco"]
 
+    novo_nome : str
+    nova_quantidade: int
+    novo_preco: float
 
-    novo_nome = input(f"Nome: [{produto_escolhido['nome']}]").strip()
-    nova_quantidade = input(f"Quantidade: [{produto_escolhido['quantidade']}]").strip()
-    novo_preco = input(f"Preço: [{produto_escolhido['preco']}]").strip()
+    while True:
+        try:
+            novo_nome = validar_edicao_nome(input(f"Nome: [{produto_escolhido['nome']}]").strip())
+            nova_quantidade = validar_edicao_quantidade(input(f"Quantidade: [{produto_escolhido['quantidade']}]").strip())
+            novo_preco = validar_edicao_preco(input(f"Preço: [{produto_escolhido['preco']}]").strip())
+
+            print(novo_nome)
+            break
+        except ErroNomeInvalido as e:
+            print(str(e))
+        except ErroQuantidadeInvalida as e:
+            print(str(e))
+        except ErroPrecoInvalido as e:
+            print(str(e))
+        except Exception:
+            print("⚠️ Ocorreu um erro. Tente novamente.")
 
     if not novo_nome and not nova_quantidade and not novo_preco:
         print("⚠️ Nada foi alterado.")
         return
 
+    print(f"Novo nome: {novo_nome}")
 
     if novo_nome:
-        try:
-            produto_escolhido['nome'] = novo_nome
-        except ValueError:
-            print("❌ Nome inválido. Alteração ignorada.")
+        produto_escolhido['nome'] = novo_nome
     if nova_quantidade:
-        try:
-            produto_escolhido['quantidade'] = int(nova_quantidade)
-        except ValueError:
-            print("❌ Quantidade inválida. Alteração ignorada.")
+        produto_escolhido['quantidade'] = nova_quantidade
     if novo_preco:
-        try:
-            produto_escolhido['preco'] = float(novo_preco)
-        except ValueError:
-            print("❌ Preço inválido. Alteração ignorada.")
+        produto_escolhido['preco'] = novo_preco
 
     is_equal = all(produto_escolhido[k] == produto_antigo[k] for k in chaves_comum)
     if is_equal:
