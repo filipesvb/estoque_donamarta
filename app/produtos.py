@@ -5,7 +5,7 @@ from datetime import datetime
 from core.logging import registrar_log
 from core.backup import registrar_backup
 
-from utils.validador import validar_edicao_nome, validar_edicao_preco, validar_edicao_quantidade
+from utils.validador import validar_edicao_nome, validar_edicao_preco, validar_edicao_quantidade, validar_nome, validar_preco, validar_quantidade
 
 from errors.exceptions import ErroNomeInvalido, ErroPrecoInvalido, ErroQuantidadeInvalida
 
@@ -45,13 +45,22 @@ def cadastrar_produto():
         print("="*40)
         print("CADASTRO DE PRODUTOS".center(40))
         print("="*40)
-        nome = input("Nome do produto: ").strip()
-        if not nome:
-            print(f"❌ Nome não pode ser vazio!")
-            return
-        quantidade = int(input("Quantidade inicial: "))
-        preco = float(input("Preço unitário (R$): "))
-        data_hora = datetime.now().strftime("%d/%m/%Y - %H:%M:%S")
+        
+        nome: str
+        quantidade : int
+        preco : float
+        
+        while True:
+            try:
+                nome = validar_nome(input("Nome do produto: ").strip())
+                quantidade = int(validar_quantidade(input("Quantidade inicial: ")))
+                preco = float(validar_preco(input("Preço unitário (R$): ")))
+                data_hora = datetime.now().strftime("%d/%m/%Y - %H:%M:%S")
+
+                break
+            except (ErroNomeInvalido, ErroPrecoInvalido, ErroQuantidadeInvalida) as e:
+                print(str(e))
+            
 
         produtos = carregar_produtos()
 
@@ -255,11 +264,12 @@ def excluir_produto():
         
         confirmacao = input(f"Você confirma que deseja excluir o produto: {produto['nome']} (ID: {produto['id']})?   [s / n]")
 
-        if confirmacao != 's':
+        if confirmacao.lower() != 's':
             print("❌ Exclusão cancelada.")
             return
         
         print(produto)
+        registrar_backup(estoque)
         estoque.remove(produto)
         salvar_produto(estoque)
 
